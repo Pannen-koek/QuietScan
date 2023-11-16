@@ -5,6 +5,7 @@ from ttkbootstrap.constants import *
 
 from src.main.scan import system_scan
 
+
 def scan_button_use(textbox):
     textbox.config(state=tb.NORMAL)
     textbox.insert(tb.END, "Executing system scan" + '\n')
@@ -47,7 +48,8 @@ historyButton.pack(side=tb.LEFT)
 bodyFrame = tb.Frame(root, width=300, height=150)
 bodyFrame.place(x=10, y=150)
 
-scanButton = tb.Button(bodyFrame, text="Start a new System Scan", command=lambda: scan_button_use(scan_output_box), width=50)
+scanButton = tb.Button(bodyFrame, text="Start a new System Scan", command=lambda: scan_button_use(scan_output_box),
+                       width=50)
 scanButton.pack()
 
 scan_output_box = tb.ScrolledText(bodyFrame, pady=5, padx=5, height=30, width=150, state=tb.DISABLED)
