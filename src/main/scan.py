@@ -1,5 +1,7 @@
 import subprocess
 import requests
+import ttkbootstrap as tb
+
 
 # Function to search for CVEs for a given application and version
 def search_cve(application_name, version):
@@ -17,21 +19,23 @@ def search_cve(application_name, version):
     else:
         return f"Error: {response.status_code}"
 
-# Define the command to list installed programs using wmic
-scan = 'wmic product get name,version'
 
-# Run the command
-result = subprocess.run(scan, capture_output=True, text=True, shell=True)
+def system_scan(textbox):
+    # Define the command to list installed programs using wmic
+    scan = 'wmic product get name,version'
 
-if result.returncode == 0:
-    output = result.stdout
-    # Process each line of the output
-    for line in output.splitlines():
-        parts = line.strip().split()
-        if len(parts) >= 2:
-            app_name = parts[0]
-            app_version = parts[1]
-            cve_results = search_cve(app_name, app_version)
-            print(f"CVEs for {app_name} {app_version}: {cve_results}")
-else:
-    print("Error:", result.stderr)
+    # Run the command
+    result = subprocess.run(scan, capture_output=True, text=True, shell=True)
+
+    if result.returncode == 0:
+        output = result.stdout
+        # Process each line of the output
+        for line in output.splitlines():
+            parts = line.strip().split()
+            if len(parts) >= 2:
+                app_name = parts[0]
+                app_version = parts[1]
+                cve_results = search_cve(app_name, app_version)
+                textbox.insert(tb.END, f"CVEs for {app_name} {app_version}: {cve_results}" + '\n')
+    else:
+        textbox.insert(tb.END, "Error:", result.stderr + '\n')
