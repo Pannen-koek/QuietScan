@@ -20,7 +20,7 @@ def search_cve(application_name, version):
         return f"Error: {response.status_code}"
 
 
-def system_scan(textbox):
+def system_scan(textbox): # TODO implement threading
     # Define the command to list installed programs using wmic
     scan = 'wmic product get name,version'
 
@@ -31,11 +31,13 @@ def system_scan(textbox):
         output = result.stdout
         # Process each line of the output
         for line in output.splitlines():
-            parts = line.strip().split()
-            if len(parts) >= 2:
-                app_name = parts[0]
-                app_version = parts[1]
-                cve_results = search_cve(app_name, app_version)
-                textbox.insert(tb.END, f"CVEs for {app_name} {app_version}: {cve_results}" + '\n')
-    else:
-        textbox.insert(tb.END, "Error:", result.stderr + '\n')
+            textbox.insert(tb.END, f"{line}" + '\n')
+
+            # parts = line.strip().split()
+            # if len(parts) >= 2:
+            # app_name = parts[0]
+            # app_version = parts[1]
+            # cve_results = search_cve(app_name, app_version)
+            # textbox.insert(tb.END, f"{app_name} {app_version}" + '\n')
+    # else:
+    # textbox.insert(tb.END, "Error:", result.stderr + '\n')
