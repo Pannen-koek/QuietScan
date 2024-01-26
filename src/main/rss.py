@@ -5,6 +5,8 @@ rss_urls = [
     'https://www.cisa.gov/cybersecurity-advisories/all.xml',
     'https://www.us-cert.gov/ncas/current-activity.xml'
     'https://nvd.nist.gov/feeds/xml/cve/misc/nvd-rss-analyzed.xml',
+    'https://krebsonsecurity.com/feed/',
+    'https://feeds.feedburner.com/TheHackersNews?format=xml',
    
 ]
 
