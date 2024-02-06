@@ -82,7 +82,8 @@ space.grid(row=1, column=2)
 scan_checklist = tb.LabelFrame(scanFrame, height=450, text="Scan Checklist")
 scan_checklist.grid(row=1, column=3, sticky=tb.W+tb.E+tb.N+tb.S)
 
-scan_step1 = tb.Checkbutton(scan_checklist, padding=10, width=40)
+step1 = tb.IntVar()
+scan_step1 = tb.Checkbutton(scan_checklist, padding=10, width=40, text="Collect running applications", variable=step1)
 scan_step1.grid(row=0)
 
 # start in home panel
