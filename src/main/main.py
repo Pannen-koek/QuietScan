@@ -27,7 +27,7 @@ def show_about_dialog():
     about_label.pack()
 
 
-def button_fill():  # TODO implement screen change functionality as screens are made
+def button_fill():
     print("Navigation Occurring")
 
 
@@ -47,40 +47,42 @@ label.pack(side=tb.LEFT)
 # nav
 navFrame = tb.Frame(root, width=700, height=50)
 navFrame.place(x=20, y=75)
-sep = tb.Separator(navFrame, orient="vertical")  # TODO implement this seperator between buttons
+sep = tb.Separator(navFrame, orient="vertical")
 sep2 = tb.Separator(navFrame, orient="vertical")
-homeButton = customtkinter.CTkButton(navFrame, text="Scan", command=lambda: raise_frame(scanFrame, homeButton), width=20)
+homeButton = customtkinter.CTkButton(navFrame, text="Scan", command=lambda: raise_frame(scanFrame, homeButton),
+                                     width=20)
 homeButton.pack(side=tb.LEFT)
 sep.pack(side=tb.LEFT, padx=20)
-aboutButton = customtkinter.CTkButton(navFrame, text="About", command=lambda: raise_frame(aboutFrame, aboutButton), width=20)
+aboutButton = customtkinter.CTkButton(navFrame, text="About", command=lambda: raise_frame(aboutFrame, aboutButton),
+                                      width=20)
 aboutButton.pack(side=tb.LEFT)
 sep2.pack(side=tb.LEFT, padx=20)
-historyButton = customtkinter.CTkButton(navFrame, text="Scan History", command=lambda: raise_frame(historyFrame, historyButton), width=20)
+historyButton = customtkinter.CTkButton(navFrame, text="Scan History",
+                                        command=lambda: raise_frame(historyFrame, historyButton), width=20)
 historyButton.pack(side=tb.LEFT)
 
 scanFrame = tb.Frame(root, width=1400, height=500)
 aboutFrame = tb.Frame(root, width=1400, height=500)
 historyFrame = tb.Frame(root, width=1400, height=500)
 
-frames = ( scanFrame, aboutFrame, historyFrame )
+frames = (scanFrame, aboutFrame, historyFrame)
 
 for frame in frames:
     frame.place(x=20, y=150)
 
-
 # scan frame - initiate scan and scan checklist boxes from wireframe
 scanButton = customtkinter.CTkButton(scanFrame, text="Start a new System Scan",
                                      command=lambda: scan_button_use(scan_output_box), width=50)
-scanButton.grid(row=0, column=0, columnspan=2, sticky=tb.W+tb.E)
+scanButton.grid(row=0, column=0, columnspan=2, sticky=tb.W + tb.E)
 
 scan_output_box = tb.ScrolledText(scanFrame, height=30, width=150, state=tb.DISABLED)
-scan_output_box.grid(row=1, column=0, columnspan=2, sticky=tb.W+tb.E)
+scan_output_box.grid(row=1, column=0, columnspan=2, sticky=tb.W + tb.E)
 
 space = tb.Frame(scanFrame, width=20)
 space.grid(row=1, column=2)
 
 scan_checklist = tb.LabelFrame(scanFrame, height=450, text="Scan Checklist")
-scan_checklist.grid(row=1, column=3, sticky=tb.W+tb.E+tb.N+tb.S)
+scan_checklist.grid(row=1, column=3, sticky=tb.W + tb.E + tb.N + tb.S)
 
 step1 = tb.IntVar()
 scan_step1 = tb.Checkbutton(scan_checklist, padding=10, width=40, text="Collect running applications", variable=step1)
