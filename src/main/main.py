@@ -19,14 +19,6 @@ def scan_button_use(textbox):
     textbox.config(state=tb.DISABLED)
 
 
-def show_about_dialog():
-    about_dialog = tk.Toplevel(root)
-    about_dialog.title("About")
-    about_dialog.geometry("1200x720")
-    about_label = tk.Label(about_dialog, text=about_text, wraplength=500, justify="left", font=("Helvetica", 18))
-    about_label.pack()
-
-
 def button_fill():
     print("Navigation Occurring")
 
