@@ -1,6 +1,23 @@
 import subprocess
 import requests
 import ttkbootstrap as tb
+import os
+import datetime
+
+
+# Save scan result into a .txt file
+def save_scan_result_to_file(output):
+    # Create a directory named "scan_history" if it doesn't exist
+    if not os.path.exists("scan_history"):
+        os.makedirs("scan_history")
+
+    # Generate a unique filename based on the current date and time
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d  %H.%M.%S")
+    filename = f"{timestamp} -- System Scan.txt"
+
+    # Write the scan result to the file
+    with open(os.path.join("scan_history", filename), "w") as file:
+        file.write(output)
 
 
 # Function to search for CVEs for a given application and version
@@ -32,7 +49,8 @@ def system_scan(textbox): # TODO implement threading
         # Process each line of the output
         for line in output.splitlines():
             textbox.insert(tb.END, f"{line}" + '\n')
-
+        save_scan_result_to_file(output)
+        
             # parts = line.strip().split()
             # if len(parts) >= 2:
             # app_name = parts[0]
