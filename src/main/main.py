@@ -89,10 +89,8 @@ scan_step1 = tb.Checkbutton(scan_checklist, padding=10, width=40, text="Collect 
 scan_step1.grid(row=0)
 
 # about frame - display information about the vulnerability scanner
-about_text_widget = tb.ScrolledText(aboutFrame, height=30, width=150, wrap=tk.WORD)
-about_text_widget.insert(tk.END, about_text)
-about_text_widget.config(state=tb.DISABLED)
-about_text_widget.pack()
+about_text_widget = tb.Label(aboutFrame, width=250, text=about_text)
+about_text_widget.place(relx=0, rely=0)
 
 # start in home panel
 raise_frame(scanFrame, homeButton)
