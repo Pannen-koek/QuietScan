@@ -5,6 +5,8 @@ import tkinter as tk
 from about import about_text
 from src.main.scan import system_scan
 
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 def raise_frame(focusedFrame, button):
     # TODO Regenerate nav buttons with selected button different color if time allows in dev
@@ -17,6 +19,19 @@ def scan_button_use(textbox):
     textbox.insert(tb.END, "Executing system scan" + '\n')
     system_scan(textbox)
     textbox.config(state=tb.DISABLED)
+
+
+def display_scan_history():
+    # List all files in the scan_history folder
+    scan_history_folder = os.path.join(CURRENT_DIR, "scan_history")
+    if not os.path.exists(scan_history_folder):
+        return "No scan history available"
+
+    # Return a string containing all scan file names
+    scan_files = os.listdir(scan_history_folder)
+    formatted_scan_files = [filename.replace(".txt", "") for filename in scan_files]
+
+    return "\n".join(formatted_scan_files)
 
 
 def button_fill():
@@ -83,6 +98,12 @@ scan_step1.grid(row=0)
 # about frame - display information about the vulnerability scanner
 about_text_widget = tb.Label(aboutFrame, width=250, text=about_text)
 about_text_widget.place(relx=0, rely=0)
+
+# history frame - display scan history
+history_text_widget = tb.ScrolledText(historyFrame, height=27, width=135, wrap=tk.WORD, font=("Helvetica", 12))
+history_text_widget.insert(tk.END, display_scan_history())
+history_text_widget.config(state=tb.DISABLED)
+history_text_widget.pack()
 
 # start in home panel
 raise_frame(scanFrame, homeButton)
