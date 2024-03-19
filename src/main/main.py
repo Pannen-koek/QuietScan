@@ -1,9 +1,11 @@
 import customtkinter
 import ttkbootstrap as tb
 import tkinter as tk
+import webbrowser
 
 from about import about_text
 from src.main.scan import system_scan
+from rss import getRSSFeed
 
 
 def raise_frame(focusedFrame, button):
@@ -23,9 +25,14 @@ def button_fill():
     print("Navigation Occurring")
 
 
+def rssNavigation(url):
+    webbrowser.open_new_tab(url)
+
+
 root = tk.Tk()
 root.title("QuietScan")
 root.geometry('1280x720')
+root.resizable(False, False)
 
 f1 = tk.Frame(root)
 
@@ -53,14 +60,14 @@ historyButton = customtkinter.CTkButton(navFrame, text="Scan History",
                                         command=lambda: raise_frame(historyFrame, historyButton), width=20)
 historyButton.pack(side=tb.LEFT)
 
-scanFrame = tb.Frame(root, width=1400, height=500)
-aboutFrame = tb.Frame(root, width=1400, height=500)
-historyFrame = tb.Frame(root, width=1400, height=500)
+scanFrame = tb.Frame(root)
+aboutFrame = tb.Frame(root)
+historyFrame = tb.Frame(root)
 
 frames = (scanFrame, aboutFrame, historyFrame)
 
 for frame in frames:
-    frame.place(x=20, y=150)
+    frame.place(x=20, y=150, width=1400, height=500)
 
 # scan frame - initiate scan and scan checklist boxes from wireframe
 scanButton = customtkinter.CTkButton(scanFrame, text="Start a new System Scan",
@@ -82,9 +89,30 @@ scan_step1.grid(row=0)
 
 # about frame - display information about the vulnerability scanner
 about_text_widget = tb.Label(aboutFrame, width=250, text=about_text)
-about_text_widget.place(relx=0, rely=0)
+about_text_widget.grid(row=0)
+
+about_rss_widget = tb.Label(aboutFrame, width=250, text="Cybersecurity News!\n")
+about_rss_widget.grid(row=1)
+
+rssEntries = getRSSFeed()
+rssRowCount = 2
+rssEntryCount = 0
+buttonNumber = 0
+
+for savedTitle, savedLink in rssEntries:
+    rssLabel = tb.Label(aboutFrame, width=250, text=savedTitle)
+    rssLink = tb.Label(aboutFrame, width=250, text=savedLink + "\n", style="primary")
+    rssLink.bind("<Button-1>", lambda e, url=savedLink: rssNavigation(url))
+    rssLabel.grid(row=rssRowCount)
+    rssRowCount = rssRowCount + 1
+    rssLink.grid(row=rssRowCount)
+    rssRowCount = rssRowCount + 1
+    rssEntryCount = rssEntryCount + 1
+    if rssEntryCount == 6:
+        break
+
 
 # start in home panel
-raise_frame(scanFrame, homeButton)
+raise_frame(aboutFrame, homeButton)
 
 root.mainloop()
