@@ -6,7 +6,7 @@ import json
 import winreg
 import ttkbootstrap as tb
 
-
+api_key = os.getenv("API_Key_QS")
 unique_apps = set()
 
 def remove_x64_suffix(app_name):
