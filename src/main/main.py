@@ -25,7 +25,7 @@ def button_fill():
     print("Navigation Occurring")
 
 
-def rssNavigation(url):
+def rss_navigation(url):
     webbrowser.open_new_tab(url)
 
 
@@ -101,8 +101,8 @@ buttonNumber = 0
 
 for savedTitle, savedLink in rssEntries:
     rssLabel = tb.Label(aboutFrame, width=250, text=savedTitle)
-    rssLink = tb.Label(aboutFrame, width=250, text=savedLink + "\n", style="primary")
-    rssLink.bind("<Button-1>", lambda e, url=savedLink: rssNavigation(url))
+    rssLink = tb.Label(aboutFrame, width=250, text="Link" + "\n", style="primary")
+    rssLink.bind("<Button-1>", lambda e, url=savedLink: rss_navigation(url))
     rssLabel.grid(row=rssRowCount)
     rssRowCount = rssRowCount + 1
     rssLink.grid(row=rssRowCount)
