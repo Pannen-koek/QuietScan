@@ -29,6 +29,19 @@ def rss_navigation(url):
     webbrowser.open_new_tab(url)
 
 
+def handle_about_columns(rss_column_count):
+    if rss_column_count == 0:
+        return 1
+    else:
+        return 0
+
+def handle_about_rows(rss_row_count, rss_column_count):
+    if (rss_column_count == 0):
+        return rss_row_count - 1
+    elif (rss_column_count == 1):
+        return rss_row_count + 1
+
+
 root = tk.Tk()
 root.title("QuietScan")
 root.geometry('1280x720')
@@ -88,29 +101,30 @@ scan_step1 = tb.Checkbutton(scan_checklist, padding=10, width=40, text="Collect 
 scan_step1.grid(row=0)
 
 # about frame - display information about the vulnerability scanner
-about_text_widget = tb.Label(aboutFrame, width=250, text=about_text)
-about_text_widget.grid(row=0)
+about_text_widget = tb.Label(aboutFrame, width=205, text=about_text)
+about_text_widget.grid(row=0, column=0, columnspan=2, sticky=tb.W + tb.E + tb.N + tb.S)
 
-about_rss_widget = tb.Label(aboutFrame, width=250, text="Cybersecurity News!\n")
-about_rss_widget.grid(row=1)
+about_rss_widget = tb.Label(aboutFrame, text="Cybersecurity News\n", font=15)
+about_rss_widget.grid(row=1, column=0, columnspan=2, sticky=tb.W + tb.E + tb.N + tb.S)
 
 rssEntries = getRSSFeed()
 rssRowCount = 2
 rssEntryCount = 0
 buttonNumber = 0
+rssColCount = 0
 
 for savedTitle, savedLink in rssEntries:
-    rssLabel = tb.Label(aboutFrame, width=250, text=savedTitle)
-    rssLink = tb.Label(aboutFrame, width=250, text="Link" + "\n", style="primary")
+    rssLabel = tb.Label(aboutFrame, width=1, text=savedTitle, relief="groove", borderwidth=.5)
+    rssLink = tb.Label(aboutFrame, width=1, text="Link to article\n", style="primary")
     rssLink.bind("<Button-1>", lambda e, url=savedLink: rss_navigation(url))
-    rssLabel.grid(row=rssRowCount)
+    rssLabel.grid(row=rssRowCount, column=rssColCount, sticky=tb.W + tb.E + tb.N + tb.S)
     rssRowCount = rssRowCount + 1
-    rssLink.grid(row=rssRowCount)
-    rssRowCount = rssRowCount + 1
+    rssLink.grid(row=rssRowCount, column=rssColCount, sticky=tb.W + tb.E + tb.N + tb.S)
+    rssRowCount = handle_about_rows(rssRowCount, rssColCount)
+    rssColCount = handle_about_columns(rssColCount)
     rssEntryCount = rssEntryCount + 1
-    if rssEntryCount == 6:
+    if rssEntryCount == 10:
         break
-
 
 # start in home panel
 raise_frame(aboutFrame, homeButton)
