@@ -2,8 +2,6 @@ import customtkinter
 import ttkbootstrap as tb
 import tkinter as tk
 import webbrowser
-import threading
-import time
 
 from about import about_text
 from src.main.scan import new_scan
