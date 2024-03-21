@@ -1,7 +1,7 @@
 import subprocess
 import unicodedata
 import requests as re
-import os 
+import os
 import json
 import winreg
 import ttkbootstrap as tb
@@ -9,11 +9,13 @@ import ttkbootstrap as tb
 api_key = os.getenv("API_Key_QS")
 unique_apps = set()
 
+
 def remove_x64_suffix(app_name):
     x64_suffixes = [" (x64)", " (64-bit)", " x64", " 64-bit", " (64-bit symbols)", " (x64 en-US)"]
     for suffix in x64_suffixes:
         app_name = app_name.replace(suffix, "")
     return app_name
+
 
 def sanitize_url(url):
     chars_to_remove = ["(", ")", "'", ","]
@@ -22,10 +24,11 @@ def sanitize_url(url):
     url = url.replace(" ", "%20")
     return url
 
+
 def system_scan():
     global unique_apps
     uninstall_regkey = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Uninstall")
-    
+
     for i in range(0, winreg.QueryInfoKey(uninstall_regkey)[0]):
         try:
             subkey_name = winreg.EnumKey(uninstall_regkey, i)
@@ -43,14 +46,15 @@ def system_scan():
             continue
 
     # Convert set to list if you need to return or further manipulate the list of apps
-    #unique_apps_list = list(unique_apps)
-    #for app in unique_apps_list:
-        #print(app)
+    # unique_apps_list = list(unique_apps)
+    # for app in unique_apps_list:
+    # print(app)
+
 
 def get_cve():
     global unique_apps
     base_url = "https://services.nvd.nist.gov/rest/json/cves/2.0/?keywordExactMatch&keywordSearch={}"
-    
+
     for app, _ in unique_apps:
         formatted_app = sanitize_url(app)  # Sanitize app name
         api_url = base_url.format(formatted_app)  # Use sanitized app name in URL
@@ -70,5 +74,7 @@ def get_cve():
                     print("-" * 50)
         except Exception as e:
             print(f"An error occurred while fetching CVEs for {app}: {e}")
+
+
 system_scan()
 get_cve()
