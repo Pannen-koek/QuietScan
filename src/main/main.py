@@ -2,9 +2,11 @@ import customtkinter
 import ttkbootstrap as tb
 import tkinter as tk
 import webbrowser
+import threading
+import time
 
 from about import about_text
-from src.main.scan import system_scan
+from src.main.scan import new_scan
 from rss import getRSSFeed
 
 
@@ -14,11 +16,8 @@ def raise_frame(focusedFrame, button):
     focusedFrame.tkraise()
 
 
-def scan_button_use(textbox):
-    textbox.config(state=tb.NORMAL)
-    textbox.insert(tb.END, "Executing system scan" + '\n')
-    system_scan(textbox)
-    textbox.config(state=tb.DISABLED)
+def scan_button_use(scan_textbox):
+    new_scan(scan_textbox)
 
 
 def button_fill():
@@ -35,10 +34,11 @@ def handle_about_columns(rss_column_count):
     else:
         return 0
 
+
 def handle_about_rows(rss_row_count, rss_column_count):
-    if (rss_column_count == 0):
+    if rss_column_count == 0:
         return rss_row_count - 1
-    elif (rss_column_count == 1):
+    elif rss_column_count == 1:
         return rss_row_count + 1
 
 
@@ -61,16 +61,16 @@ navFrame = tb.Frame(root, width=700, height=50)
 navFrame.place(x=20, y=75)
 sep = tb.Separator(navFrame, orient="vertical")
 sep2 = tb.Separator(navFrame, orient="vertical")
-homeButton = customtkinter.CTkButton(navFrame, text="Scan", command=lambda: raise_frame(scanFrame, homeButton),
+scanButton = customtkinter.CTkButton(navFrame, text="Scan", command=lambda: raise_frame(scanFrame, scanButton),
                                      width=20)
-homeButton.pack(side=tb.LEFT)
-sep.pack(side=tb.LEFT, padx=20)
 aboutButton = customtkinter.CTkButton(navFrame, text="About", command=lambda: raise_frame(aboutFrame, aboutButton),
                                       width=20)
-aboutButton.pack(side=tb.LEFT)
-sep2.pack(side=tb.LEFT, padx=20)
 historyButton = customtkinter.CTkButton(navFrame, text="Scan History",
                                         command=lambda: raise_frame(historyFrame, historyButton), width=20)
+aboutButton.pack(side=tb.LEFT)
+sep.pack(side=tb.LEFT, padx=20)
+scanButton.pack(side=tb.LEFT)
+sep2.pack(side=tb.LEFT, padx=20)
 historyButton.pack(side=tb.LEFT)
 
 scanFrame = tb.Frame(root)
@@ -127,6 +127,6 @@ for savedTitle, savedLink in rssEntries:
         break
 
 # start in home panel
-raise_frame(aboutFrame, homeButton)
+raise_frame(aboutFrame, aboutButton)
 
 root.mainloop()

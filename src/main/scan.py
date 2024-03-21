@@ -1,4 +1,7 @@
 import subprocess
+import threading
+import time
+
 import unicodedata
 import requests as re
 import os
@@ -8,6 +11,7 @@ import ttkbootstrap as tb
 
 api_key = os.getenv("API_Key_QS")
 unique_apps = set()
+executing = False
 
 
 def remove_x64_suffix(app_name):
@@ -25,8 +29,45 @@ def sanitize_url(url):
     return url
 
 
-def system_scan():
+def enter_heading_text(textbox, text):
+    textbox.config(state=tb.NORMAL)
+    textbox.insert(tb.END, "\n" + "-" * 180 + "\n" + text + "\n" + "-" * 180 + "\n\n")
+    textbox.see(tb.END)
+    textbox.config(state=tb.DISABLED)
+    time.sleep(2)
+
+
+def enter_text(textbox, text):
+    textbox.config(state=tb.NORMAL)
+    textbox.insert(tb.END, text + "\n")
+    textbox.see(tb.END)
+    textbox.config(state=tb.DISABLED)
+
+
+def new_scan(textbox):
+    global executing
+    if not executing:
+        textbox.config(state=tb.NORMAL)
+        textbox.delete("1.0", tb.END)
+        enter_heading_text(textbox, "Starting new QuietScan")
+        time.sleep(2)
+        scanThread = threading.Thread(target=scan, args=(textbox,))
+        scanThread.start()
+        textbox.config(state=tb.DISABLED)
+
+
+def scan(textbox):
+    collect_unique_apps(textbox)
+    get_cve(textbox)
+
+
+def collect_unique_apps(textbox):
     global unique_apps
+    global executing
+    executing = True
+
+    enter_heading_text(textbox, "Collecting unique applications on your machine")
+
     uninstall_regkey = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"Software\Microsoft\Windows\CurrentVersion\Uninstall")
 
     for i in range(0, winreg.QueryInfoKey(uninstall_regkey)[0]):
@@ -42,8 +83,11 @@ def system_scan():
                     app_name = app_name.replace(app_version, "").strip()
                 # Use a tuple of (app_name, app_version) to maintain uniqueness
                 unique_apps.add((app_name, app_version))
+                enter_text(textbox, f"{app_name}: {app_version}")
         except FileNotFoundError:
             continue
+
+    enter_heading_text(textbox, "Completed collecting unique applications on your machine")
 
     # Convert set to list if you need to return or further manipulate the list of apps
     # unique_apps_list = list(unique_apps)
@@ -51,16 +95,21 @@ def system_scan():
     # print(app)
 
 
-def get_cve():
+def get_cve(textbox):
     global unique_apps
+    global executing
+
+    enter_heading_text(textbox, "Querying NIST Database for vulnerabilities")
+
     base_url = "https://services.nvd.nist.gov/rest/json/cves/2.0/?keywordExactMatch&keywordSearch={}"
 
     for app, _ in unique_apps:
+        enter_text(textbox, f"Searching {app} for known vulnerabilities")
         formatted_app = sanitize_url(app)  # Sanitize app name
         api_url = base_url.format(formatted_app)  # Use sanitized app name in URL
         try:
             response = re.get(api_url)
-            print(response.status_code)
+            enter_text(textbox, f"Response code: {response.status_code}")
             json_data = json.loads(response.text)
             vulndata = json_data.get('result', {}).get('CVE_Items', [])
             for item in vulndata:
@@ -69,12 +118,12 @@ def get_cve():
                 description_data = cve.get('description', {}).get('description_data', [])
                 descriptions = [desc.get('value') for desc in description_data if desc.get('lang') == 'en']
                 if cve_id and descriptions:
-                    print(f"CVE ID: {cve_id}")
-                    print(f"Description: {descriptions[0]}")
-                    print("-" * 50)
+                    enter_text(textbox, f"CVE Query for {cve_id}")
+                    enter_text(textbox, f"CVE ID: {cve_id}")
+                    enter_text(textbox, f"Description: {descriptions[0]}")
+                    enter_text(textbox, "-" * 50)
         except Exception as e:
-            print(f"An error occurred while fetching CVEs for {app}: {e}")
+            enter_text(textbox, f"An error occurred while fetching CVEs for {app}: {e}")
 
-
-system_scan()
-get_cve()
+    enter_heading_text(textbox, "Completed querying NIST Database for vulnerabilities")
+    executing = False
