@@ -1,7 +1,10 @@
 import customtkinter
 import ttkbootstrap as tb
 import tkinter as tk
+import tkinter.messagebox as messagebox
+import os
 
+from tkinter import Scrollbar
 from about import about_text
 from src.main.scan import system_scan
 
@@ -25,13 +28,49 @@ def display_scan_history():
     # List all files in the scan_history folder
     scan_history_folder = os.path.join(CURRENT_DIR, "scan_history")
     if not os.path.exists(scan_history_folder):
-        return "No scan history available"
+        return []
 
-    # Return a string containing all scan file names
+    # Create buttons for each scan file
     scan_files = os.listdir(scan_history_folder)
-    formatted_scan_files = [filename.replace(".txt", "") for filename in scan_files]
+    scan_buttons = []
+    for filename in scan_files:
+        formatted_filename = filename.replace(".txt", "")
+        button = customtkinter.CTkButton(historyFrame, text=formatted_filename,
+                                         command=lambda file=filename: show_scan_result(file), width=50)
 
-    return "\n".join(formatted_scan_files)
+        history_text_widget.window_create(tk.END, window=button)
+
+        history_text_widget.insert(tk.END, "\n")
+
+    return scan_buttons
+
+
+def layout_history_frame():
+    global history_text_widget
+    history_text_widget = None  
+    historyFrame = tb.Frame(root, width=1400, height=500)
+    historyFrame.place(x=20, y=150)
+
+    history_text_widget = tb.ScrolledText(historyFrame, height=27, width=135, wrap=tk.WORD, font=("Helvetica", 12))
+    history_text_widget.pack(side="left", fill="both", expand=True)  
+
+    history_scrollbar = Scrollbar(historyFrame, orient="vertical", command=history_text_widget.yview)
+    history_scrollbar.pack(side="right", fill="y")
+
+    history_text_widget.config(yscrollcommand=history_scrollbar.set)
+
+    scan_buttons = display_scan_history()
+    for button in scan_buttons:
+        button.pack() 
+
+
+def show_scan_result(filename):
+    scan_history_folder = os.path.join(CURRENT_DIR, "scan_history")
+    file_path = os.path.join(scan_history_folder, filename)
+    with open(file_path, "r") as file:
+        content = file.read()
+
+    messagebox.showinfo("Scan Result", content)
 
 
 def button_fill():
@@ -41,6 +80,7 @@ def button_fill():
 root = tk.Tk()
 root.title("QuietScan")
 root.geometry('1280x720')
+
 
 f1 = tk.Frame(root)
 
