@@ -81,7 +81,6 @@ def collect_unique_apps(textbox):
                 app_name = remove_x64_suffix(app_name)
                 if app_version in app_name:
                     app_name = app_name.replace(app_version, "").strip()
-                # Use a tuple of (app_name, app_version) to maintain uniqueness
                 unique_apps.add((app_name, app_version))
                 enter_text(textbox, f"{app_name}: {app_version}")
         except FileNotFoundError:
@@ -89,7 +88,6 @@ def collect_unique_apps(textbox):
 
     enter_heading_text(textbox, "Completed collecting unique applications on your machine")
 
-    # Convert set to list if you need to return or further manipulate the list of apps
     # unique_apps_list = list(unique_apps)
     # for app in unique_apps_list:
     # print(app)
@@ -102,13 +100,13 @@ def get_cve(textbox):
     enter_heading_text(textbox, "Querying NIST Database for vulnerabilities")
 
     base_url = "https://services.nvd.nist.gov/rest/json/cves/2.0/?keywordExactMatch&keywordSearch={}"
-
+    headers = api_key
     for app, _ in unique_apps:
         enter_text(textbox, f"Searching {app} for known vulnerabilities")
-        formatted_app = sanitize_url(app)  # Sanitize app name
-        api_url = base_url.format(formatted_app)  # Use sanitized app name in URL
+        formatted_app = sanitize_url(app)
+        api_url = base_url.format(formatted_app)
         try:
-            response = re.get(api_url)
+            response = re.get(api_url, headers=headers)
             enter_text(textbox, f"Response code: {response.status_code}")
             json_data = json.loads(response.text)
             vulndata = json_data.get('result', {}).get('CVE_Items', [])
