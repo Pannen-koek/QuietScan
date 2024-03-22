@@ -1,7 +1,7 @@
 import customtkinter
 import ttkbootstrap as tb
 import tkinter as tk
-import tkinter.messagebox as messagebox
+from tkinter import Scrollbar
 import os
 
 from tkinter import Scrollbar
@@ -39,29 +39,23 @@ def display_scan_history():
                                          command=lambda file=filename: show_scan_result(file), width=50)
 
         history_text_widget.window_create(tk.END, window=button)
-
-        history_text_widget.insert(tk.END, "\n")
+        history_text_widget.insert(tk.END, "\n\n")  # Add spacing between buttons
 
     return scan_buttons
 
 
 def layout_history_frame():
     global history_text_widget
-    history_text_widget = None  
+    history_text_widget = None
     historyFrame = tb.Frame(root, width=1400, height=500)
     historyFrame.place(x=20, y=150)
 
-    history_text_widget = tb.ScrolledText(historyFrame, height=27, width=135, wrap=tk.WORD, font=("Helvetica", 12))
-    history_text_widget.pack(side="left", fill="both", expand=True)  
-
-    history_scrollbar = Scrollbar(historyFrame, orient="vertical", command=history_text_widget.yview)
-    history_scrollbar.pack(side="right", fill="y")
-
-    history_text_widget.config(yscrollcommand=history_scrollbar.set)
+    history_text_widget = tb.ScrolledText(historyFrame, height=27, width=300, wrap=tk.WORD, font=("Helvetica", 12))
+    history_text_widget.pack(side="left", fill="both", expand=True)
 
     scan_buttons = display_scan_history()
     for button in scan_buttons:
-        button.pack() 
+        button.pack()
 
 
 def show_scan_result(filename):
@@ -70,7 +64,17 @@ def show_scan_result(filename):
     with open(file_path, "r") as file:
         content = file.read()
 
-    messagebox.showinfo("Scan Result", content)
+    result_window = tk.Toplevel()
+    result_window.title("Scan Result")
+
+    text_widget = tk.Text(result_window, wrap=tk.WORD, width=160, height=40)
+    scrollbar = Scrollbar(result_window, command=text_widget.yview)
+    text_widget.config(yscrollcommand=scrollbar.set)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+    text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+    text_widget.insert(tk.END, content)
+    text_widget.config(state=tk.DISABLED)
 
 
 def button_fill():
@@ -80,7 +84,6 @@ def button_fill():
 root = tk.Tk()
 root.title("QuietScan")
 root.geometry('1280x720')
-
 
 f1 = tk.Frame(root)
 
