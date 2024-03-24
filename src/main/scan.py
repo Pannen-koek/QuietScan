@@ -9,7 +9,7 @@ import json
 import winreg
 import ttkbootstrap as tb
 
-api_key = os.getenv("API_Key_QS")
+api_key = os.getenv("API_Key_NQS")
 unique_apps = set()
 executing = False
 
@@ -88,26 +88,22 @@ def collect_unique_apps(textbox):
 
     enter_heading_text(textbox, "Completed collecting unique applications on your machine")
 
-    # unique_apps_list = list(unique_apps)
-    # for app in unique_apps_list:
-    # print(app)
-
-
 def get_cve(textbox):
     global unique_apps
     global executing
 
     enter_heading_text(textbox, "Querying NIST Database for vulnerabilities")
 
-    base_url = "https://services.nvd.nist.gov/rest/json/cves/2.0/?keywordExactMatch&keywordSearch={}"
-    headers = api_key
+    base_url = "https://services.nvd.nist.gov/rest/json/cves/2.0/?keywordExactMatch&keywordSearch="
     for app, _ in unique_apps:
         enter_text(textbox, f"Searching {app} for known vulnerabilities")
         formatted_app = sanitize_url(app)
-        api_url = base_url.format(formatted_app)
+        api_url = base_url + formatted_app
         try:
-            response = re.get(api_url, headers=headers)
-            enter_text(textbox, f"Response code: {response.status_code}")
+            response = re.get(api_url, headers={"apiKey":api_key})
+            time.sleep(3)
+            #enter_text(textbox, f"Response code: {response.status_code}")
+            enter_text(textbox, f"Raw response for {app}:\n{response.text}")
             json_data = json.loads(response.text)
             vulndata = json_data.get('result', {}).get('CVE_Items', [])
             for item in vulndata:
@@ -121,7 +117,7 @@ def get_cve(textbox):
                     enter_text(textbox, f"Description: {descriptions[0]}")
                     enter_text(textbox, "-" * 50)
         except Exception as e:
-            enter_text(textbox, f"An error occurred while fetching CVEs for {app}: {e}")
+            enter_text(textbox, f"Found no CVEs for {app}: {e}")
 
     enter_heading_text(textbox, "Completed querying NIST Database for vulnerabilities")
     executing = False
