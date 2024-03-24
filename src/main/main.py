@@ -37,8 +37,8 @@ def display_scan_history():
         button = customtkinter.CTkButton(historyFrame, text=formatted_filename,
                                          command=lambda file=filename: show_scan_result(file), width=50)
 
-        history_text_widget.window_create(tk.END, window=button)
-        history_text_widget.insert(tk.END, "\n\n")  # Add spacing between buttons
+        history_text_widget.window_create(tb.END, window=button)
+        history_text_widget.insert(tb.END, "\n\n")  # Add spacing between buttons
 
     return scan_buttons
 
@@ -49,7 +49,7 @@ def layout_history_frame():
     historyFrame = tb.Frame(root, width=1400, height=500)
     historyFrame.place(x=20, y=150)
 
-    history_text_widget = tb.ScrolledText(historyFrame, height=27, width=300, wrap=tk.WORD, font=("Helvetica", 12))
+    history_text_widget = tb.ScrolledText(historyFrame, height=27, width=300, wrap=tb.WORD, font=("Helvetica", 12))
     history_text_widget.pack(side="left", fill="both", expand=True)
 
     scan_buttons = display_scan_history()
@@ -63,17 +63,17 @@ def show_scan_result(filename):
     with open(file_path, "r") as file:
         content = file.read()
 
-    result_window = tk.Toplevel()
+    result_window = tb.Toplevel()
     result_window.title("Scan Result")
 
-    text_widget = tk.Text(result_window, wrap=tk.WORD, width=160, height=40)
+    text_widget = tb.Text(result_window, wrap=tb.WORD, width=160, height=40)
     scrollbar = Scrollbar(result_window, command=text_widget.yview)
     text_widget.config(yscrollcommand=scrollbar.set)
-    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-    text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    scrollbar.pack(side=tb.RIGHT, fill=tb.Y)
+    text_widget.pack(side=tb.LEFT, fill=tb.BOTH, expand=True)
 
-    text_widget.insert(tk.END, content)
-    text_widget.config(state=tk.DISABLED)
+    text_widget.insert(tb.END, content)
+    text_widget.config(state=tb.DISABLED)
 
 
 def button_fill():
@@ -103,7 +103,7 @@ root.title("QuietScan")
 root.geometry('1280x720')
 root.resizable(False, False)
 
-f1 = tk.Frame(root)
+f1 = tb.Frame(root)
 
 # header frame
 headerFrame = tb.Frame(root, width=1200, height=150)
@@ -183,10 +183,10 @@ for savedTitle, savedLink in rssEntries:
         break
 
 # history frame - display scan history
-history_text_widget = tb.ScrolledText(historyFrame, height=27, width=135, wrap=tk.WORD, font=("Helvetica", 12))
-history_text_widget.insert(tk.END, display_scan_history())
+history_text_widget = tb.ScrolledText(historyFrame, height=27, width=135, wrap=tb.WORD, font=("Helvetica", 12))
+history_text_widget.insert(tb.END, display_scan_history())
 history_text_widget.config(state=tb.DISABLED)
-history_text_widget.pack()
+history_text_widget.grid()
 
 # start in home panel
 raise_frame(aboutFrame, aboutButton)

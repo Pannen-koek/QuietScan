@@ -11,6 +11,9 @@ import ttkbootstrap as tb
 import os
 import datetime
 
+api_key = os.getenv("API_Key_NQS")
+unique_apps = set()
+executing = False
 
 # Save scan result into a .txt file
 def save_scan_result_to_file(output):
@@ -25,10 +28,6 @@ def save_scan_result_to_file(output):
     # Write the scan result to the file
     with open(os.path.join("scan_history", filename), "w") as file:
         file.write(output)
-
-api_key = os.getenv("API_Key_NQS")
-unique_apps = set()
-executing = False
 
 
 def remove_x64_suffix(app_name):
