@@ -3,10 +3,12 @@ import ttkbootstrap as tb
 import tkinter as tk
 from tkinter import Scrollbar
 import os
+import webbrowser
 
 from tkinter import Scrollbar
 from about import about_text
-from src.main.scan import system_scan
+from src.main.scan import new_scan
+from rss import getRSSFeed
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -17,11 +19,8 @@ def raise_frame(focusedFrame, button):
     focusedFrame.tkraise()
 
 
-def scan_button_use(textbox):
-    textbox.config(state=tb.NORMAL)
-    textbox.insert(tb.END, "Executing system scan" + '\n')
-    system_scan(textbox)
-    textbox.config(state=tb.DISABLED)
+def scan_button_use(scan_textbox):
+    new_scan(scan_textbox)
 
 
 def display_scan_history():
@@ -81,9 +80,28 @@ def button_fill():
     print("Navigation Occurring")
 
 
+def rss_navigation(url):
+    webbrowser.open_new_tab(url)
+
+
+def handle_about_columns(rss_column_count):
+    if rss_column_count == 0:
+        return 1
+    else:
+        return 0
+
+
+def handle_about_rows(rss_row_count, rss_column_count):
+    if rss_column_count == 0:
+        return rss_row_count - 1
+    elif rss_column_count == 1:
+        return rss_row_count + 1
+
+
 root = tk.Tk()
 root.title("QuietScan")
 root.geometry('1280x720')
+root.resizable(False, False)
 
 f1 = tk.Frame(root)
 
@@ -99,26 +117,26 @@ navFrame = tb.Frame(root, width=700, height=50)
 navFrame.place(x=20, y=75)
 sep = tb.Separator(navFrame, orient="vertical")
 sep2 = tb.Separator(navFrame, orient="vertical")
-homeButton = customtkinter.CTkButton(navFrame, text="Scan", command=lambda: raise_frame(scanFrame, homeButton),
+scanButton = customtkinter.CTkButton(navFrame, text="Scan", command=lambda: raise_frame(scanFrame, scanButton),
                                      width=20)
-homeButton.pack(side=tb.LEFT)
-sep.pack(side=tb.LEFT, padx=20)
 aboutButton = customtkinter.CTkButton(navFrame, text="About", command=lambda: raise_frame(aboutFrame, aboutButton),
                                       width=20)
-aboutButton.pack(side=tb.LEFT)
-sep2.pack(side=tb.LEFT, padx=20)
 historyButton = customtkinter.CTkButton(navFrame, text="Scan History",
                                         command=lambda: raise_frame(historyFrame, historyButton), width=20)
+aboutButton.pack(side=tb.LEFT)
+sep.pack(side=tb.LEFT, padx=20)
+scanButton.pack(side=tb.LEFT)
+sep2.pack(side=tb.LEFT, padx=20)
 historyButton.pack(side=tb.LEFT)
 
-scanFrame = tb.Frame(root, width=1400, height=500)
-aboutFrame = tb.Frame(root, width=1400, height=500)
-historyFrame = tb.Frame(root, width=1400, height=500)
+scanFrame = tb.Frame(root)
+aboutFrame = tb.Frame(root)
+historyFrame = tb.Frame(root)
 
 frames = (scanFrame, aboutFrame, historyFrame)
 
 for frame in frames:
-    frame.place(x=20, y=150)
+    frame.place(x=20, y=150, width=1400, height=500)
 
 # scan frame - initiate scan and scan checklist boxes from wireframe
 scanButton = customtkinter.CTkButton(scanFrame, text="Start a new System Scan",
@@ -139,8 +157,30 @@ scan_step1 = tb.Checkbutton(scan_checklist, padding=10, width=40, text="Collect 
 scan_step1.grid(row=0)
 
 # about frame - display information about the vulnerability scanner
-about_text_widget = tb.Label(aboutFrame, width=250, text=about_text)
-about_text_widget.place(relx=0, rely=0)
+about_text_widget = tb.Label(aboutFrame, width=205, text=about_text)
+about_text_widget.grid(row=0, column=0, columnspan=2, sticky=tb.W + tb.E + tb.N + tb.S)
+
+about_rss_widget = tb.Label(aboutFrame, text="Cybersecurity News\n", font=15)
+about_rss_widget.grid(row=1, column=0, columnspan=2, sticky=tb.W + tb.E + tb.N + tb.S)
+
+rssEntries = getRSSFeed()
+rssRowCount = 2
+rssEntryCount = 0
+buttonNumber = 0
+rssColCount = 0
+
+for savedTitle, savedLink in rssEntries:
+    rssLabel = tb.Label(aboutFrame, width=1, text=savedTitle, relief="groove", borderwidth=.5)
+    rssLink = tb.Label(aboutFrame, width=1, text="Link to article\n", style="primary")
+    rssLink.bind("<Button-1>", lambda e, url=savedLink: rss_navigation(url))
+    rssLabel.grid(row=rssRowCount, column=rssColCount, sticky=tb.W + tb.E + tb.N + tb.S)
+    rssRowCount = rssRowCount + 1
+    rssLink.grid(row=rssRowCount, column=rssColCount, sticky=tb.W + tb.E + tb.N + tb.S)
+    rssRowCount = handle_about_rows(rssRowCount, rssColCount)
+    rssColCount = handle_about_columns(rssColCount)
+    rssEntryCount = rssEntryCount + 1
+    if rssEntryCount == 10:
+        break
 
 # history frame - display scan history
 history_text_widget = tb.ScrolledText(historyFrame, height=27, width=135, wrap=tk.WORD, font=("Helvetica", 12))
@@ -149,6 +189,6 @@ history_text_widget.config(state=tb.DISABLED)
 history_text_widget.pack()
 
 # start in home panel
-raise_frame(scanFrame, homeButton)
+raise_frame(aboutFrame, aboutButton)
 
 root.mainloop()
