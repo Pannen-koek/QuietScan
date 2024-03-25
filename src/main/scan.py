@@ -118,21 +118,26 @@ def get_cve(textbox):
         api_url = base_url + formatted_app
         try:
             response = re.get(api_url, headers={"apiKey":api_key})
-            time.sleep(3)
+            time.sleep(1)
             #enter_text(textbox, f"Response code: {response.status_code}")
-            enter_text(textbox, f"Raw response for {app}:\n{response.text}")
             json_data = json.loads(response.text)
-            vulndata = json_data.get('result', {}).get('CVE_Items', [])
-            for item in vulndata:
-                cve = item.get('cve', {})
-                cve_id = cve.get('CVE_data_meta', {}).get('ID')
-                description_data = cve.get('description', {}).get('description_data', [])
-                descriptions = [desc.get('value') for desc in description_data if desc.get('lang') == 'en']
-                if cve_id and descriptions:
-                    enter_text(textbox, f"CVE Query for {cve_id}")
-                    enter_text(textbox, f"CVE ID: {cve_id}")
-                    enter_text(textbox, f"Description: {descriptions[0]}")
-                    enter_text(textbox, "-" * 50)
+            total_results = json_data.get('totalResults', 0)
+
+            if total_results == 0:
+                enter_text(textbox, f"Found no CVEs for {app}")
+
+            else:
+                vulndata = json_data.get('result', {}).get('CVE_Items', [])
+                for item in vulndata:
+                    cve = item.get('cve', {})
+                    cve_id = cve.get('CVE_data_meta', {}).get('ID')
+                    description_data = cve.get('description', {}).get('description_data', [])
+                    descriptions = [desc.get('value') for desc in description_data if desc.get('lang') == 'en']
+                    if cve_id and descriptions:
+                        enter_text(textbox, f"CVE Query for {cve_id}")
+                        enter_text(textbox, f"CVE ID: {cve_id}")
+                        enter_text(textbox, f"Description: {descriptions[0]}")
+                        enter_text(textbox, "-" * 50)
         except Exception as e:
             enter_text(textbox, f"Found no CVEs for {app}: {e}")
     enter_heading_text(textbox, "Completed querying NIST Database for vulnerabilities")
