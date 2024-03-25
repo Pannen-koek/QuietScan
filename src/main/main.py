@@ -15,8 +15,8 @@ def raise_frame(focusedFrame, button):
     focusedFrame.tkraise()
 
 
-def scan_button_use(scan_textbox):
-    new_scan(scan_textbox)
+def scan_button_use(scan_textbox, refreshFrame, widget):
+    new_scan(scan_textbox, refreshFrame, widget)
 
 
 def layout_history_frame():
@@ -28,7 +28,7 @@ def layout_history_frame():
     history_text_widget = tb.ScrolledText(historyFrame, height=27, width=300, wrap=tb.WORD, font=("Helvetica", 12))
     history_text_widget.pack(side="left", fill="both", expand=True)
 
-    scan_buttons = display_scan_history()
+    scan_buttons = display_scan_history(historyFrame, history_text_widget)
     for button in scan_buttons:
         button.pack()
 
@@ -97,7 +97,7 @@ for frame in frames:
 
 # scan frame - initiate scan and scan checklist boxes from wireframe
 scanButton = customtkinter.CTkButton(scanFrame, text="Start a new System Scan",
-                                     command=lambda: scan_button_use(scan_output_box), width=50)
+                                     command=lambda: scan_button_use(scan_output_box, historyFrame, history_text_widget), width=50)
 scanButton.grid(row=0, column=0, columnspan=2, sticky=tb.W + tb.E)
 
 scan_output_box = tb.ScrolledText(scanFrame, height=30, width=150, state=tb.DISABLED)

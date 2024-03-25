@@ -103,21 +103,21 @@ def enter_text(textbox, text):
     textbox.config(state=tb.DISABLED)
 
 
-def new_scan(textbox):
+def new_scan(textbox, frame, widget):
     global executing
     if not executing:
         textbox.config(state=tb.NORMAL)
         textbox.delete("1.0", tb.END)
         enter_heading_text(textbox, "Starting new QuietScan")
-        time.sleep(2)
-        scanThread = threading.Thread(target=scan, args=(textbox,))
+        # time.sleep(2)
+        scanThread = threading.Thread(target=scan, args=(textbox, frame, widget))
         scanThread.start()
         textbox.config(state=tb.DISABLED)
 
 
-def scan(textbox):
+def scan(textbox, frame, widget):
     collect_unique_apps(textbox)
-    get_cve(textbox)
+    get_cve(textbox, frame, widget)
 
 
 def collect_unique_apps(textbox):
@@ -147,7 +147,7 @@ def collect_unique_apps(textbox):
 
     enter_heading_text(textbox, "Completed collecting unique applications on your machine")
 
-def get_cve(textbox):
+def get_cve(textbox, frame, widget):
     global unique_apps
     global executing
 
@@ -155,12 +155,12 @@ def get_cve(textbox):
 
     base_url = "https://services.nvd.nist.gov/rest/json/cves/2.0/?keywordExactMatch&keywordSearch="
     for app, _ in unique_apps:
-        enter_text(textbox, f"Searching {app} for known vulnerabilities")
+        enter_text(textbox, f"\nSearching {app} for known vulnerabilities")
         formatted_app = sanitize_url(app)
         api_url = base_url + formatted_app
         try:
             response = re.get(api_url, headers={"apiKey":api_key})
-            time.sleep(1)
+            # time.sleep(1)
             #enter_text(textbox, f"Response code: {response.status_code}")
             json_data = json.loads(response.text)
             total_results = json_data.get('totalResults', 0)
@@ -184,4 +184,5 @@ def get_cve(textbox):
             enter_text(textbox, f"Found no CVEs for {app}: {e}")
     enter_heading_text(textbox, "Completed querying NIST Database for vulnerabilities")
     save_scan_result_to_file(textbox.get("1.0", tb.END))
+    display_scan_history(frame, widget)
     executing = False
