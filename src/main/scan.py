@@ -161,29 +161,33 @@ def get_cve(textbox, frame, widget, checkbox):
         api_url = base_url + formatted_app
         try:
             response = re.get(api_url, headers={"apiKey":api_key})
-            # time.sleep(1)
+            time.sleep(1)
             #enter_text(textbox, f"Response code: {response.status_code}")
             json_data = json.loads(response.text)
-            total_results = json_data.get('totalResults', 0)
+            total_results = json_data.get('totalResults')
 
             if total_results == 0:
                 enter_text(textbox, f"Found no CVEs for {app}")
                 continue
-
             else:
-                vulndata = json_data.get('result', {}).get('CVE_Items', [])
+                vulndata = json_data.get('vulnerabilities', [])
                 for item in vulndata:
                     cve = item.get('cve', {})
-                    cve_id = cve.get('CVE_data_meta', {}).get('ID')
-                    description_data = cve.get('description', {}).get('description_data', [])
-                    descriptions = [desc.get('value') for desc in description_data if desc.get('lang') == 'en']
-                    metrics = item.get('metrics', {}).get('baseMetricV2', {}).get('cvssV2', {})
+                    cveId = cve.get('id')
+                    try:
+                        cveYear = int(cveId.split("-")[1] if cveId else 0)
+                    except ValueError:
+                        continue
+                    if cveYear < 2020:
+                        continue
+                    descriptions = [desc.get('value') for desc in cve.get('descriptions') if desc.get('lang') == 'en']
+                    metrics = item.get('metrics', {}).get('cvssMetricV2', {})
                     baseSeverity = metrics.get('baseSeverity')
                     exploitabilityScore = metrics.get('exploitabilityScore')
                     impactScore = metrics.get('impactScore')
-                    if cve_id and descriptions:
-                        enter_text(textbox, f"CVE Query for {cve_id}")
-                        enter_text(textbox, f"CVE ID: {cve_id}")
+                    if cveId and descriptions:
+                        enter_text(textbox, f"CVE Query for {cveId}")
+                        enter_text(textbox, f"CVE ID: {cveId}")
                         enter_text(textbox, f"Description: {descriptions[0]}")
                         enter_text(textbox, f"Exploitability Score: {exploitabilityScore}")
                         enter_text(textbox, f"Impact Score: {impactScore}")
