@@ -178,5 +178,5 @@ def get_cve(textbox):
         except Exception as e:
             enter_text(textbox, f"Found no CVEs for {app}: {e}")
     enter_heading_text(textbox, "Completed querying NIST Database for vulnerabilities")
-    display_scan_history()
+    save_scan_result_to_file(textbox.get("1.0", tb.END))
     executing = False
