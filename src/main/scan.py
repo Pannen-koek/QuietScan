@@ -1,7 +1,6 @@
 import subprocess
 import threading
 import time
-
 import unicodedata
 import requests as re
 import os
@@ -11,9 +10,52 @@ import ttkbootstrap as tb
 import os
 import datetime
 
+from tkinter import Scrollbar
+
 api_key = os.getenv("API_Key_NQS")
 unique_apps = set()
 executing = False
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def display_scan_history(frame, widget):
+    # List all files in the scan_history folder
+    scan_history_folder = os.path.join(CURRENT_DIR, "scan_history")
+    if not os.path.exists(scan_history_folder):
+        return []
+
+    # Create buttons for each scan file
+    scan_files = os.listdir(scan_history_folder)
+    scan_buttons = []
+    for filename in scan_files:
+        formatted_filename = filename.replace(".txt", "")
+        button = tb.Button(frame, text=formatted_filename,
+                                         command=lambda file=filename: show_scan_result(file), width=50)
+
+        widget.window_create(tb.END, window=button)
+        widget.insert(tb.END, "\n\n")  # Add spacing between buttons
+
+    return scan_buttons
+
+
+def show_scan_result(filename):
+    scan_history_folder = os.path.join(CURRENT_DIR, "scan_history")
+    file_path = os.path.join(scan_history_folder, filename)
+    with open(file_path, "r") as file:
+        content = file.read()
+
+    result_window = tb.Toplevel()
+    result_window.title("Scan Result")
+
+    text_widget = tb.Text(result_window, wrap=tb.WORD, width=160, height=40)
+    scrollbar = Scrollbar(result_window, command=text_widget.yview)
+    text_widget.config(yscrollcommand=scrollbar.set)
+    scrollbar.pack(side=tb.RIGHT, fill=tb.Y)
+    text_widget.pack(side=tb.LEFT, fill=tb.BOTH, expand=True)
+
+    text_widget.insert(tb.END, content)
+    text_widget.config(state=tb.DISABLED)
+
 
 # Save scan result into a .txt file
 def save_scan_result_to_file(output):
@@ -104,6 +146,7 @@ def collect_unique_apps(textbox):
 
     enter_heading_text(textbox, "Completed collecting unique applications on your machine")
 
+
 def get_cve(textbox):
     global unique_apps
     global executing
@@ -116,9 +159,9 @@ def get_cve(textbox):
         formatted_app = sanitize_url(app)
         api_url = base_url + formatted_app
         try:
-            response = re.get(api_url, headers={"apiKey":api_key})
+            response = re.get(api_url, headers={"apiKey": api_key})
             time.sleep(3)
-            #enter_text(textbox, f"Response code: {response.status_code}")
+            # enter_text(textbox, f"Response code: {response.status_code}")
             enter_text(textbox, f"Raw response for {app}:\n{response.text}")
             json_data = json.loads(response.text)
             vulndata = json_data.get('result', {}).get('CVE_Items', [])
@@ -135,4 +178,5 @@ def get_cve(textbox):
         except Exception as e:
             enter_text(textbox, f"Found no CVEs for {app}: {e}")
     enter_heading_text(textbox, "Completed querying NIST Database for vulnerabilities")
+    display_scan_history()
     executing = False

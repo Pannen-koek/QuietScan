@@ -1,16 +1,12 @@
 import customtkinter
 import ttkbootstrap as tb
 import tkinter as tk
-from tkinter import Scrollbar
 import os
 import webbrowser
 
-from tkinter import Scrollbar
 from about import about_text
-from src.main.scan import new_scan
+from src.main.scan import new_scan, display_scan_history
 from rss import getRSSFeed
-
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def raise_frame(focusedFrame, button):
@@ -21,26 +17,6 @@ def raise_frame(focusedFrame, button):
 
 def scan_button_use(scan_textbox):
     new_scan(scan_textbox)
-
-
-def display_scan_history():
-    # List all files in the scan_history folder
-    scan_history_folder = os.path.join(CURRENT_DIR, "scan_history")
-    if not os.path.exists(scan_history_folder):
-        return []
-
-    # Create buttons for each scan file
-    scan_files = os.listdir(scan_history_folder)
-    scan_buttons = []
-    for filename in scan_files:
-        formatted_filename = filename.replace(".txt", "")
-        button = customtkinter.CTkButton(historyFrame, text=formatted_filename,
-                                         command=lambda file=filename: show_scan_result(file), width=50)
-
-        history_text_widget.window_create(tb.END, window=button)
-        history_text_widget.insert(tb.END, "\n\n")  # Add spacing between buttons
-
-    return scan_buttons
 
 
 def layout_history_frame():
@@ -55,25 +31,6 @@ def layout_history_frame():
     scan_buttons = display_scan_history()
     for button in scan_buttons:
         button.pack()
-
-
-def show_scan_result(filename):
-    scan_history_folder = os.path.join(CURRENT_DIR, "scan_history")
-    file_path = os.path.join(scan_history_folder, filename)
-    with open(file_path, "r") as file:
-        content = file.read()
-
-    result_window = tb.Toplevel()
-    result_window.title("Scan Result")
-
-    text_widget = tb.Text(result_window, wrap=tb.WORD, width=160, height=40)
-    scrollbar = Scrollbar(result_window, command=text_widget.yview)
-    text_widget.config(yscrollcommand=scrollbar.set)
-    scrollbar.pack(side=tb.RIGHT, fill=tb.Y)
-    text_widget.pack(side=tb.LEFT, fill=tb.BOTH, expand=True)
-
-    text_widget.insert(tb.END, content)
-    text_widget.config(state=tb.DISABLED)
 
 
 def button_fill():
@@ -184,7 +141,7 @@ for savedTitle, savedLink in rssEntries:
 
 # history frame - display scan history
 history_text_widget = tb.ScrolledText(historyFrame, height=27, width=135, wrap=tb.WORD, font=("Helvetica", 12))
-history_text_widget.insert(tb.END, display_scan_history())
+history_text_widget.insert(tb.END, display_scan_history(historyFrame, history_text_widget))
 history_text_widget.config(state=tb.DISABLED)
 history_text_widget.grid()
 
