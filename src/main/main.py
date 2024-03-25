@@ -1,16 +1,12 @@
 import customtkinter
 import ttkbootstrap as tb
 import tkinter as tk
-from tkinter import Scrollbar
 import os
 import webbrowser
 
-from tkinter import Scrollbar
 from about import about_text
-from src.main.scan import new_scan
+from src.main.scan import new_scan, display_scan_history
 from rss import getRSSFeed
-
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def raise_frame(focusedFrame, button):
@@ -19,28 +15,8 @@ def raise_frame(focusedFrame, button):
     focusedFrame.tkraise()
 
 
-def scan_button_use(scan_textbox):
-    new_scan(scan_textbox)
-
-
-def display_scan_history():
-    # List all files in the scan_history folder
-    scan_history_folder = os.path.join(CURRENT_DIR, "scan_history")
-    if not os.path.exists(scan_history_folder):
-        return []
-
-    # Create buttons for each scan file
-    scan_files = os.listdir(scan_history_folder)
-    scan_buttons = []
-    for filename in scan_files:
-        formatted_filename = filename.replace(".txt", "")
-        button = customtkinter.CTkButton(historyFrame, text=formatted_filename,
-                                         command=lambda file=filename: show_scan_result(file), width=50)
-
-        history_text_widget.window_create(tk.END, window=button)
-        history_text_widget.insert(tk.END, "\n\n")  # Add spacing between buttons
-
-    return scan_buttons
+def scan_button_use(scan_textbox, refreshFrame, widget, step1_checkbox, step2_checkbox):
+    new_scan(scan_textbox, refreshFrame, widget, step1_checkbox, step2_checkbox)
 
 
 def layout_history_frame():
@@ -49,31 +25,12 @@ def layout_history_frame():
     historyFrame = tb.Frame(root, width=1400, height=500)
     historyFrame.place(x=20, y=150)
 
-    history_text_widget = tb.ScrolledText(historyFrame, height=27, width=300, wrap=tk.WORD, font=("Helvetica", 12))
+    history_text_widget = tb.ScrolledText(historyFrame, height=27, width=300, wrap=tb.WORD, font=("Helvetica", 12))
     history_text_widget.pack(side="left", fill="both", expand=True)
 
-    scan_buttons = display_scan_history()
+    scan_buttons = display_scan_history(historyFrame, history_text_widget)
     for button in scan_buttons:
         button.pack()
-
-
-def show_scan_result(filename):
-    scan_history_folder = os.path.join(CURRENT_DIR, "scan_history")
-    file_path = os.path.join(scan_history_folder, filename)
-    with open(file_path, "r") as file:
-        content = file.read()
-
-    result_window = tk.Toplevel()
-    result_window.title("Scan Result")
-
-    text_widget = tk.Text(result_window, wrap=tk.WORD, width=160, height=40)
-    scrollbar = Scrollbar(result_window, command=text_widget.yview)
-    text_widget.config(yscrollcommand=scrollbar.set)
-    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-    text_widget.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-    text_widget.insert(tk.END, content)
-    text_widget.config(state=tk.DISABLED)
 
 
 def button_fill():
@@ -103,7 +60,7 @@ root.title("QuietScan")
 root.geometry('1280x720')
 root.resizable(False, False)
 
-f1 = tk.Frame(root)
+f1 = tb.Frame(root)
 
 # header frame
 headerFrame = tb.Frame(root, width=1200, height=150)
@@ -140,7 +97,7 @@ for frame in frames:
 
 # scan frame - initiate scan and scan checklist boxes from wireframe
 scanButton = customtkinter.CTkButton(scanFrame, text="Start a new System Scan",
-                                     command=lambda: scan_button_use(scan_output_box), width=50)
+                                     command=lambda: scan_button_use(scan_output_box, historyFrame, history_text_widget, scan_step1, scan_step2), width=50)
 scanButton.grid(row=0, column=0, columnspan=2, sticky=tb.W + tb.E)
 
 scan_output_box = tb.ScrolledText(scanFrame, height=30, width=150, state=tb.DISABLED)
@@ -155,6 +112,9 @@ scan_checklist.grid(row=1, column=3, sticky=tb.W + tb.E + tb.N + tb.S)
 step1 = tb.IntVar()
 scan_step1 = tb.Checkbutton(scan_checklist, padding=10, width=40, text="Collect running applications", variable=step1)
 scan_step1.grid(row=0)
+step2 = tb.IntVar()
+scan_step2 = tb.Checkbutton(scan_checklist, padding=10, width=40, text="Query NIST Database for vulnerabilities", variable=step2)
+scan_step2.grid(row=1)
 
 # about frame - display information about the vulnerability scanner
 about_text_widget = tb.Label(aboutFrame, width=205, text=about_text)
@@ -183,10 +143,10 @@ for savedTitle, savedLink in rssEntries:
         break
 
 # history frame - display scan history
-history_text_widget = tb.ScrolledText(historyFrame, height=27, width=135, wrap=tk.WORD, font=("Helvetica", 12))
-history_text_widget.insert(tk.END, display_scan_history())
+history_text_widget = tb.ScrolledText(historyFrame, height=27, width=135, wrap=tb.WORD, font=("Helvetica", 12))
+history_text_widget.insert(tb.END, display_scan_history(historyFrame, history_text_widget))
 history_text_widget.config(state=tb.DISABLED)
-history_text_widget.pack()
+history_text_widget.grid()
 
 # start in home panel
 raise_frame(aboutFrame, aboutButton)
