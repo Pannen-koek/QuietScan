@@ -9,6 +9,7 @@ QuietScan is a free and open-source cybersecurity software. By using QuietScan, 
 *Run the following commands individually to install needed dependencies*
 
 ttkbootstrap --> python -m pip install ttkbootstrap\
-customtkinter --> pip3 install customtkinter
+customtkinter --> pip3 install customtkinter\
+feedparser --> pip install feedparser
 
 Run locally by executing the main file in IDE
