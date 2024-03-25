@@ -184,5 +184,5 @@ def get_cve(textbox, frame, widget):
             enter_text(textbox, f"Found no CVEs for {app}: {e}")
     enter_heading_text(textbox, "Completed querying NIST Database for vulnerabilities")
     save_scan_result_to_file(textbox.get("1.0", tb.END))
-    display_scan_history(frame, widget)
+    # display_scan_history(frame, widget)
     executing = False
