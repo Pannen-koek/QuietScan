@@ -15,8 +15,8 @@ def raise_frame(focusedFrame, button):
     focusedFrame.tkraise()
 
 
-def scan_button_use(scan_textbox, refreshFrame, widget):
-    new_scan(scan_textbox, refreshFrame, widget)
+def scan_button_use(scan_textbox, refreshFrame, widget, step1_checkbox, step2_checkbox):
+    new_scan(scan_textbox, refreshFrame, widget, step1_checkbox, step2_checkbox)
 
 
 def layout_history_frame():
@@ -97,7 +97,7 @@ for frame in frames:
 
 # scan frame - initiate scan and scan checklist boxes from wireframe
 scanButton = customtkinter.CTkButton(scanFrame, text="Start a new System Scan",
-                                     command=lambda: scan_button_use(scan_output_box, historyFrame, history_text_widget), width=50)
+                                     command=lambda: scan_button_use(scan_output_box, historyFrame, history_text_widget, scan_step1, scan_step2), width=50)
 scanButton.grid(row=0, column=0, columnspan=2, sticky=tb.W + tb.E)
 
 scan_output_box = tb.ScrolledText(scanFrame, height=30, width=150, state=tb.DISABLED)
@@ -112,6 +112,9 @@ scan_checklist.grid(row=1, column=3, sticky=tb.W + tb.E + tb.N + tb.S)
 step1 = tb.IntVar()
 scan_step1 = tb.Checkbutton(scan_checklist, padding=10, width=40, text="Collect running applications", variable=step1)
 scan_step1.grid(row=0)
+step2 = tb.IntVar()
+scan_step2 = tb.Checkbutton(scan_checklist, padding=10, width=40, text="Query NIST Database for vulnerabilities", variable=step2)
+scan_step2.grid(row=1)
 
 # about frame - display information about the vulnerability scanner
 about_text_widget = tb.Label(aboutFrame, width=205, text=about_text)

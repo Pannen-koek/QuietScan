@@ -103,24 +103,24 @@ def enter_text(textbox, text):
     textbox.config(state=tb.DISABLED)
 
 
-def new_scan(textbox, frame, widget):
+def new_scan(textbox, frame, widget, step1_checkbox, step2_checkbox):
     global executing
     if not executing:
         textbox.config(state=tb.NORMAL)
         textbox.delete("1.0", tb.END)
         enter_heading_text(textbox, "Starting new QuietScan")
         # time.sleep(2)
-        scanThread = threading.Thread(target=scan, args=(textbox, frame, widget))
+        scanThread = threading.Thread(target=scan, args=(textbox, frame, widget, step1_checkbox, step2_checkbox))
         scanThread.start()
         textbox.config(state=tb.DISABLED)
 
 
-def scan(textbox, frame, widget):
-    collect_unique_apps(textbox)
-    get_cve(textbox, frame, widget)
+def scan(textbox, frame, widget, step1_checkbox, step2_checkbox):
+    collect_unique_apps(textbox, step1_checkbox)
+    get_cve(textbox, frame, widget, step2_checkbox)
 
 
-def collect_unique_apps(textbox):
+def collect_unique_apps(textbox, checkbox):
     global unique_apps
     global executing
     executing = True
@@ -146,8 +146,9 @@ def collect_unique_apps(textbox):
             continue
 
     enter_heading_text(textbox, "Completed collecting unique applications on your machine")
+    checkbox.invoke()
 
-def get_cve(textbox, frame, widget):
+def get_cve(textbox, frame, widget, checkbox):
     global unique_apps
     global executing
 
@@ -183,6 +184,7 @@ def get_cve(textbox, frame, widget):
         except Exception as e:
             enter_text(textbox, f"Found no CVEs for {app}: {e}")
     enter_heading_text(textbox, "Completed querying NIST Database for vulnerabilities")
+    checkbox.invoke()
     save_scan_result_to_file(textbox.get("1.0", tb.END))
     # display_scan_history(frame, widget)
     executing = False
