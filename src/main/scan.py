@@ -125,6 +125,7 @@ def get_cve(textbox):
 
             if total_results == 0:
                 enter_text(textbox, f"Found no CVEs for {app}")
+                continue
 
             else:
                 vulndata = json_data.get('result', {}).get('CVE_Items', [])
@@ -133,10 +134,16 @@ def get_cve(textbox):
                     cve_id = cve.get('CVE_data_meta', {}).get('ID')
                     description_data = cve.get('description', {}).get('description_data', [])
                     descriptions = [desc.get('value') for desc in description_data if desc.get('lang') == 'en']
+                    metrics = item.get('metrics', {}).get('baseMetricV2', {}).get('cvssV2', {})
+                    baseSeverity = metrics.get('baseSeverity')
+                    exploitabilityScore = metrics.get('exploitabilityScore')
+                    impactScore = metrics.get('impactScore')
                     if cve_id and descriptions:
                         enter_text(textbox, f"CVE Query for {cve_id}")
                         enter_text(textbox, f"CVE ID: {cve_id}")
                         enter_text(textbox, f"Description: {descriptions[0]}")
+                        enter_text(textbox, f"Exploitability Score: {exploitabilityScore}")
+                        enter_text(textbox, f"Impact Score: {impactScore}")
                         enter_text(textbox, "-" * 50)
         except Exception as e:
             enter_text(textbox, f"Found no CVEs for {app}: {e}")
