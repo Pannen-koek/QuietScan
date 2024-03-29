@@ -80,12 +80,16 @@ def remove_x64_suffix(app_name):
     return app_name
 
 
-def sanitize_url(url):
+def sanitize_url(app_name, app_version):
     chars_to_remove = ["(", ")", "'", ","]
     for char in chars_to_remove:
-        url = url.replace(char, "")
-    url = url.replace(" ", "%20")
-    return url
+        app_name = app_name.replace(char, "")
+        app_version = app_version.replace(char, "")
+    #url = url.replace(" ", "%20")
+    #return url
+    app_name = app_name.lower().replace(" ", "%20").replace("&", "%26")
+    app_version = app_version.lower().replace(" ", "%20").replace("&", "%26")
+    return app_name + "%20" + app_version
 
 
 def enter_heading_text(textbox, text):
@@ -155,9 +159,10 @@ def get_cve(textbox, frame, widget, checkbox):
     enter_heading_text(textbox, "Querying NIST Database for vulnerabilities")
 
     base_url = "https://services.nvd.nist.gov/rest/json/cves/2.0/?keywordExactMatch&keywordSearch="
-    for app, _ in unique_apps:
+    for app in unique_apps:
+        app_name, app_version = app
         enter_text(textbox, f"\nSearching {app} for known vulnerabilities")
-        formatted_app = sanitize_url(app)
+        formatted_app = sanitize_url(app_name, app_version)
         api_url = base_url + formatted_app
         try:
             response = re.get(api_url, headers={"apiKey":api_key})
