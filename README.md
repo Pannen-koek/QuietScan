@@ -1,4 +1,4 @@
-![logo](https://github.com/Pannen-koek/QuietScan/blob/main/images/quietscan_logo.PNG)
+![logo](images/quietscan_logo.PNG)
 
 Today, people's daily lives are increasingly dependent on the Internet; similarly, all company operations are inseparable from the information technology department and their own networks. However, the development of information technology has also brought about many problems, and cyber-attacks are one of the biggest problems. The financial and reputational damage caused by cyber-attacks is growing, many companies are looking to improve their cybersecurity defenses with affordable and effective vulnerability scanners. Based on this demand, our team designed a vulnerability scanner--QuietScan.
 
