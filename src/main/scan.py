@@ -187,15 +187,19 @@ def get_cve(textbox, frame, widget, checkbox):
                         continue
                     descriptions = [desc.get('value') for desc in cve.get('descriptions') if desc.get('lang') == 'en']
                     metrics = item.get('metrics', {}).get('cvssMetricV2', {})
+                    references = item.get('references')
                     baseSeverity = metrics.get('baseSeverity')
                     exploitabilityScore = metrics.get('exploitabilityScore')
                     impactScore = metrics.get('impactScore')
+                    moreInfo =  references.get('url')
                     if cveId and descriptions:
                         enter_text(textbox, f"CVE Query for {cveId}")
                         enter_text(textbox, f"CVE ID: {cveId}")
                         enter_text(textbox, f"Description: {descriptions[0]}")
+                        enter_text(textbox, f"baseSeverity: {baseSeverity}")
                         enter_text(textbox, f"Exploitability Score: {exploitabilityScore}")
                         enter_text(textbox, f"Impact Score: {impactScore}")
+                        enter_text(textbox, f"More Information: {moreInfo}")
                         enter_text(textbox, "-" * 50)
         except Exception as e:
             enter_text(textbox, f"Found no CVEs for {app}: {e}")
