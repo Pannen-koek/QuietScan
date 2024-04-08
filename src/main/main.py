@@ -77,7 +77,7 @@ label.pack(side=tb.LEFT)
 
 # nav
 navFrame = tb.Frame(root, width=700, height=50)
-navFrame.place(x=20, y=75)
+navFrame.place(x=20, y=100)
 sep = tb.Separator(navFrame, orient="vertical")
 sep2 = tb.Separator(navFrame, orient="vertical")
 scanButton = customtkinter.CTkButton(navFrame, text="Scan", command=lambda: raise_frame(scanFrame, scanButton),
