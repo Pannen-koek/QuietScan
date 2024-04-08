@@ -7,6 +7,7 @@ import webbrowser
 from about import about_text
 from src.main.scan import new_scan, display_scan_history
 from rss import getRSSFeed
+from PIL import Image, ImageTk
 
 
 def raise_frame(focusedFrame, button):
@@ -62,11 +63,20 @@ root.resizable(False, False)
 
 f1 = tb.Frame(root)
 
+# icon
+root.iconbitmap('quietscan_appicon.ico')
+
 # header frame
 headerFrame = tb.Frame(root, width=1200, height=150)
 headerFrame.place(x=10, y=10)
 
-label = tb.Label(headerFrame, text="QuietScan", font=("Helvetica", 42))
+# resize image
+original_image = Image.open("quietscan_logo.PNG")
+
+resized_image = original_image.resize((355, 85), Image.LANCZOS)
+
+logo_image = ImageTk.PhotoImage(resized_image)
+label = tb.Label(headerFrame, image=logo_image)
 label.pack(side=tb.LEFT)
 
 # nav
