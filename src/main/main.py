@@ -69,7 +69,7 @@ headerFrame.place(x=10, y=10)
 # resize image
 original_image = Image.open("quietscan_logo.PNG")
 
-resized_image = original_image.resize((355, 85), Image.LANCZOS)
+resized_image = original_image.resize((355, 110), Image.LANCZOS)
 
 logo_image = ImageTk.PhotoImage(resized_image)
 label = tb.Label(headerFrame, image=logo_image)
