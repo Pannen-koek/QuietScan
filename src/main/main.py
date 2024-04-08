@@ -34,10 +34,6 @@ def layout_history_frame():
         button.pack()
 
 
-def button_fill():
-    print("Navigation Occurring")
-
-
 def rss_navigation(url):
     webbrowser.open_new_tab(url)
 
