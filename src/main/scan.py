@@ -80,16 +80,16 @@ def remove_x64_suffix(app_name):
     return app_name
 
 
-def sanitize_url(app_name, app_version):
+def sanitize_url(app_name):
     chars_to_remove = ["(", ")", "'", ","]
     for char in chars_to_remove:
         app_name = app_name.replace(char, "")
-        app_version = app_version.replace(char, "")
+        #app_version = app_version.replace(char, "")
     #url = url.replace(" ", "%20")
     #return url
     app_name = app_name.lower().replace(" ", "%20").replace("&", "%26")
-    app_version = app_version.lower().replace(" ", "%20").replace("&", "%26")
-    return app_name + "%20" + app_version
+    #app_version = app_version.lower().replace(" ", "%20").replace("&", "%26")
+    return app_name #+ "%20" + app_version
 
 
 def enter_heading_text(textbox, text):
@@ -162,7 +162,7 @@ def get_cve(textbox, frame, widget, checkbox):
     for app in unique_apps:
         app_name, app_version = app
         enter_text(textbox, f"\nSearching {app} for known vulnerabilities")
-        formatted_app = sanitize_url(app_name, app_version)
+        formatted_app = sanitize_url(app_name)
         api_url = base_url + formatted_app
         try:
             response = re.get(api_url, headers={"apiKey":api_key})
@@ -183,7 +183,7 @@ def get_cve(textbox, frame, widget, checkbox):
                         cveYear = int(cveId.split("-")[1] if cveId else 0)
                     except ValueError:
                         continue
-                    if cveYear < 2020:
+                    if cveYear < 2016:
                         continue
                     descriptions = [desc.get('value') for desc in cve.get('descriptions') if desc.get('lang') == 'en']
                     metrics = item.get('metrics', {}).get('cvssMetricV2', {})
@@ -191,7 +191,7 @@ def get_cve(textbox, frame, widget, checkbox):
                     baseSeverity = metrics.get('baseSeverity')
                     exploitabilityScore = metrics.get('exploitabilityScore')
                     impactScore = metrics.get('impactScore')
-                    moreInfo =  references.get('url')
+                    #moreInfo =  references.get('url')
                     if cveId and descriptions:
                         enter_text(textbox, f"CVE Query for {cveId}")
                         enter_text(textbox, f"CVE ID: {cveId}")
@@ -199,7 +199,7 @@ def get_cve(textbox, frame, widget, checkbox):
                         enter_text(textbox, f"baseSeverity: {baseSeverity}")
                         enter_text(textbox, f"Exploitability Score: {exploitabilityScore}")
                         enter_text(textbox, f"Impact Score: {impactScore}")
-                        enter_text(textbox, f"More Information: {moreInfo}")
+                        #enter_text(textbox, f"More Information: {moreInfo}")
                         enter_text(textbox, "-" * 50)
         except Exception as e:
             enter_text(textbox, f"Found no CVEs for {app}: {e}")
