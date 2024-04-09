@@ -163,7 +163,7 @@ def get_cve(textbox, frame, widget, checkbox):
         app_name, app_version = app
         enter_text(textbox, f"\nSearching {app} for known vulnerabilities")
         formatted_app = sanitize_url(app_name)
-        api_url = base_url #+ formatted_app
+        api_url = base_url + formatted_app
         try:
             response = re.get(api_url, headers={"apiKey":api_key})
             time.sleep(1)
