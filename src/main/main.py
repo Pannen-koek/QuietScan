@@ -7,6 +7,7 @@ import webbrowser
 from about import about_text
 from src.main.scan import new_scan, display_scan_history
 from rss import getRSSFeed
+from PIL import Image, ImageTk
 
 
 def raise_frame(focusedFrame, button):
@@ -31,10 +32,6 @@ def layout_history_frame():
     scan_buttons = display_scan_history(historyFrame, history_text_widget)
     for button in scan_buttons:
         button.pack()
-
-
-def button_fill():
-    print("Navigation Occurring")
 
 
 def rss_navigation(url):
@@ -62,16 +59,25 @@ root.resizable(False, False)
 
 f1 = tb.Frame(root)
 
+# icon
+root.iconbitmap('quietscan_appicon.ico')
+
 # header frame
 headerFrame = tb.Frame(root, width=1200, height=150)
 headerFrame.place(x=10, y=10)
 
-label = tb.Label(headerFrame, text="QuietScan", font=("Helvetica", 42))
+# resize image
+original_image = Image.open("quietscan_logo.PNG")
+
+resized_image = original_image.resize((355, 110), Image.LANCZOS)
+
+logo_image = ImageTk.PhotoImage(resized_image)
+label = tb.Label(headerFrame, image=logo_image)
 label.pack(side=tb.LEFT)
 
 # nav
 navFrame = tb.Frame(root, width=700, height=50)
-navFrame.place(x=20, y=75)
+navFrame.place(x=20, y=100)
 sep = tb.Separator(navFrame, orient="vertical")
 sep2 = tb.Separator(navFrame, orient="vertical")
 scanButton = customtkinter.CTkButton(navFrame, text="Scan", command=lambda: raise_frame(scanFrame, scanButton),
@@ -97,7 +103,8 @@ for frame in frames:
 
 # scan frame - initiate scan and scan checklist boxes from wireframe
 scanButton = customtkinter.CTkButton(scanFrame, text="Start a new System Scan",
-                                     command=lambda: scan_button_use(scan_output_box, historyFrame, history_text_widget, scan_step1, scan_step2), width=50)
+                                     command=lambda: scan_button_use(scan_output_box, historyFrame, history_text_widget,
+                                                                     scan_step1, scan_step2), width=50)
 scanButton.grid(row=0, column=0, columnspan=2, sticky=tb.W + tb.E)
 
 scan_output_box = tb.ScrolledText(scanFrame, height=30, width=150, state=tb.DISABLED)
@@ -113,7 +120,8 @@ step1 = tb.IntVar()
 scan_step1 = tb.Checkbutton(scan_checklist, padding=10, width=40, text="Collect running applications", variable=step1)
 scan_step1.grid(row=0)
 step2 = tb.IntVar()
-scan_step2 = tb.Checkbutton(scan_checklist, padding=10, width=40, text="Query NIST Database for vulnerabilities", variable=step2)
+scan_step2 = tb.Checkbutton(scan_checklist, padding=10, width=40, text="Query NIST Database for vulnerabilities",
+                            variable=step2)
 scan_step2.grid(row=1)
 
 # about frame - display information about the vulnerability scanner
