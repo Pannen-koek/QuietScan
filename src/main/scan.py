@@ -84,7 +84,7 @@ def sanitize_url(app_name):
     chars_to_remove = ["(", ")", "'", ","]
     for char in chars_to_remove:
         app_name = app_name.replace(char, "")
-        app_version = app_version.replace(char, "")
+        #app_version = app_version.replace(char, "")
     #url = url.replace(" ", "%20")
     #return url
     app_name = app_name.lower().replace(" ", "%20").replace("&", "%26")
