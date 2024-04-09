@@ -183,7 +183,7 @@ def get_cve(textbox, frame, widget, checkbox):
                         cveYear = int(cveId.split("-")[1] if cveId else 0)
                     except ValueError:
                         continue
-                    if cveYear < 2016:
+                    if cveYear < 2020:
                         continue
                     descriptions = [desc.get('value') for desc in cve.get('descriptions') if desc.get('lang') == 'en']
                     metrics = item.get('metrics', {}).get('cvssMetricV2', {})
