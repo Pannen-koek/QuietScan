@@ -80,7 +80,7 @@ def remove_x64_suffix(app_name):
     return app_name
 
 
-def sanitize_url(app_name, app_version):
+def sanitize_url(app_name):
     chars_to_remove = ["(", ")", "'", ","]
     for char in chars_to_remove:
         app_name = app_name.replace(char, "")
@@ -88,8 +88,8 @@ def sanitize_url(app_name, app_version):
     #url = url.replace(" ", "%20")
     #return url
     app_name = app_name.lower().replace(" ", "%20").replace("&", "%26")
-    app_version = app_version.lower().replace(" ", "%20").replace("&", "%26")
-    return app_name + "%20" + app_version
+    #app_version = app_version.lower().replace(" ", "%20").replace("&", "%26")
+    return app_name #+ "%20" + app_version
 
 
 def enter_heading_text(textbox, text):
@@ -162,8 +162,8 @@ def get_cve(textbox, frame, widget, checkbox):
     for app in unique_apps:
         app_name, app_version = app
         enter_text(textbox, f"\nSearching {app} for known vulnerabilities")
-        formatted_app = sanitize_url(app_name, app_version)
-        api_url = base_url + formatted_app
+        formatted_app = sanitize_url(app_name)
+        api_url = base_url #+ formatted_app
         try:
             response = re.get(api_url, headers={"apiKey":api_key})
             time.sleep(1)
